@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Goal</h2>
+    <form method="POST">
+        <div class="form-group mb-3">
+            <label for="goal_type">Goal Type:</label>
+            <select class="form-control" id="goal_type" name="goal_type" required>
+                <option value="Weight" {% if goal.GoalType == 'Weight' %}selected{% endif %}>Weight</option>
+                <option value="Exercise" {% if goal.GoalType == 'Exercise' %}selected{% endif %}>Exercise</option>
+                <option value="Diet" {% if goal.GoalType == 'Diet' %}selected{% endif %}>Diet</option>
+                <option value="Other" {% if goal.GoalType == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+        <div class="form-group mb-3">
+            <label for="description">Description:</label>
+            <textarea class="form-control" id="description" name="description" required>{{ goal.Description }}</textarea>
+        </div>
+        <div class="form-group mb-3">
+            <label for="target_value">Target Value:</label>
+            <input type="text" class="form-control" id="target_value" name="target_value" value="{{ goal.TargetValue }}" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="deadline">Deadline:</label>
+            <input type="date" class="form-control" id="deadline" name="deadline" value="{{ goal.Deadline }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Goal</button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %} 

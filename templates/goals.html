@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Goals</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header, footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        nav {
+            background-color: #333;
+            overflow: hidden;
+        }
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        nav ul li {
+            float: left;
+        }
+        nav ul li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        nav ul li a:hover {
+            background-color: #575757;
+        }
+        section {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        h2, h3 {
+            color: #4CAF50;
+        }
+        form {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        form input, form button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .progress {
+            height: 20px;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+        }
+        .progress-bar {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            line-height: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Your Goals</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <section>
+        <h2>Add a New Goal</h2>
+        <form method="POST" action="{{ url_for('goals') }}">
+            <label for="goal_name">Goal Name:</label>
+            <input type="text" name="goal_name" id="goal_name" required>
+
+            <label for="target_value">Target Value:</label>
+            <input type="number" step="0.01" name="target_value" id="target_value" required>
+
+            <label for="current_value">Current Value:</label>
+            <input type="number" step="0.01" name="current_value" id="current_value" value="0" required>
+
+            <button type="submit">Add Goal</button>
+        </form>
+
+        <h3>Your Existing Goals:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Goal Name</th>
+                    <th>Status</th>
+                    <th>Target</th>
+                    <th>Current</th>
+                    <th>Progress</th>
+                    <th>Update Status</th>
+                    <th>Update Progress</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for goal in goals %}
+                    <tr>
+                        <td>{{ goal.GoalType }}</td>
+                        <td>{{ goal.Status }}</td>
+                        <td>{{ "%.1f"|format(goal.TargetValue|float) }}</td>
+                        <td>{{ "%.1f"|format(goal.CurrentValue|float) }}</td>
+                        <td>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ goal.Progress|float|round|int }}%" 
+                                     aria-valuenow="{{ goal.Progress|float|round|int }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    {{ "%.1f%%"|format(goal.Progress|float) }}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('goals', goal_id=goal.GoalID) }}">
+                                <select name="status" id="status_{{ goal.GoalID }}">
+                                    <option value="In Progress" {% if goal.Status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="Completed" {% if goal.Status == 'Completed' %}selected{% endif %}>Completed</option>
+                                    <option value="On Hold" {% if goal.Status == 'On Hold' %}selected{% endif %}>On Hold</option>
+                                </select>
+                                <input type="hidden" name="action" value="update_status">
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('goals', goal_id=goal.GoalID) }}">
+                                <input type="hidden" name="action" value="update_progress">
+                                <input type="number" step="0.01" name="current_value" required>
+                                <button type="submit" class="btn btn-primary btn-sm">Update Progress</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7">No goals yet. Add a goal to get started!</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <p><a href="{{ url_for('index') }}" style="color: white;">Back to Home</a></p>
+    </footer>
+</body>
+</html>

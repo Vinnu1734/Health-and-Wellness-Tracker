@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Meal</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Log a Meal</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <form method="POST">
+            <div class="form-group">
+                <label for="user_id">User ID</label>
+                <input type="text" class="form-control" id="user_id" name="user_id" required>
+            </div>
+            <div class="form-group">
+                <label for="meal_id">Meal ID</label>
+                <input type="text" class="form-control" id="meal_id" name="meal_id" required>
+            </div>
+            <div class="form-group">
+                <label for="log_date">Log Date (YYYY-MM-DD)</label>
+                <input type="date" class="form-control" id="log_date" name="log_date" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Log Meal</button>
+        </form>
+    </div>
+</body>
+</html>
